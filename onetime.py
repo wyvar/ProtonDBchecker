@@ -44,7 +44,7 @@ def getProgramList():
             f.close()
         except:
             pass
-        f.close()
+        
 
 
 def checkIfProtonDBGame(*args):

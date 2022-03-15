@@ -1,13 +1,24 @@
 import requests 
 import configparser
+import os
+import json
+import colormsg as test
 
+#Directories in Program
+DIR_PATH = os.path.dirname(__file__)
+CONFIG_PATH = os.path.join(DIR_PATH, 'config' )
+DATA_PATH = os.path.join(DIR_PATH, 'data')
+
+#config Files
+configApp = os.path.join(CONFIG_PATH, 'app.ini')
 config= configparser.ConfigParser()
-config.read('app.ini')
 
+config.read(configApp)
+
+#data
+programsJsonPath = os.path.join(DATA_PATH, 'programs.json')
 ##Lists
-programsIdList=[]
 gamesIDList=[]
-
 
 
 def ammountInfo():
@@ -15,24 +26,45 @@ def ammountInfo():
     r = requests.get(url)
     response = r.json()
     ammountOfGames = response['uniqueGames']
-    print("Current Amount of Games on ProtonDB is: %s" %ammountOfGames )
+    return "Current Amount of Games on ProtonDB is: %s" %ammountOfGames 
 
 
 
-def getProgramList():
-    with open ("allPrograms.txt", "w+") as f: 
+def CreateProgramsJson():
+    with open (programsJsonPath, "w+") as f: 
         try:
             r = requests.get('https://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json')
             response = r.json()
             programlist = response['applist']['apps']
-            for game in programlist:
-                programsIdList.append(game['appid'])
-                f.write(str(game['appid']) + " = " + game['name'] + '\n' )
-            f.close()
+            json.dumps(programsJsonPath, f)
+        except Exception as e:
+            print(e)
+        
+def readJson(file):
+    pass
+
+def CreateProgramsList():
+    programIdList=[]
+    with open (programsJsonPath, "r") as f:
+        temp = json.load(f)
+        for program in temp:
+            programIdList.append(temp['appid'])
+    return programIdList    
+
+def CheckProtonDBStatus(*args):
+    for game in args:
+        try:
+            url = config['links']['alinkGameProtonDBStatus'] + str(ganme) + '.json'
+            r = requests.get(url)
+            response = r.json()
+            with open(os.path.join( DATA_PATH , 'gamnesstatus',str(game)+'.json')) as f:
+                json.dumps(response, f)
         except:
             pass
-        f.close()
 
+def CreateFile(path):
+    with open(path , 'w+'):
+        print("Path %s has been created" %path)
 
 def checkIfProtonDBGame():
     for i in gamesIDList:
@@ -50,24 +82,6 @@ def checkIfProtonDBGame():
 
     return gamesIDList
 
-ammountInfo()
-getProgramList()
-gamesIDList = programsIdList[1:20]
+el = test.InfoMsg(ammountInfo())
+print(el)
 
-
-import time
-
-start = time.perf_counter()
-
-checkIfProtonDBGame()
-
-
-
-
-with open("GamesID.txt", 'w+' ) as f:
-    for item in gamesIDList:
-        f.write(str(item) + '\n')
-    f.close()
-
-end = time.perf_counter()
-print(end - start)
