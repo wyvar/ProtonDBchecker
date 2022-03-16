@@ -2,7 +2,7 @@ import requests
 import configparser
 import os
 import json
-import colormsg as test
+import colormsg as cmsg
 
 #Directories in Program
 DIR_PATH = os.path.dirname(__file__)
@@ -36,7 +36,7 @@ def CreateProgramsJson():
             r = requests.get('https://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json')
             response = r.json()
             programlist = response['applist']['apps']
-            json.dumps(programsJsonPath, f)
+            json.dump(programlist, f)
         except Exception as e:
             print(e)
         
@@ -54,18 +54,34 @@ def CreateProgramsList():
 def CheckProtonDBStatus(*args):
     for game in args:
         try:
-            url = config['links']['alinkGameProtonDBStatus'] + str(ganme) + '.json'
+            url = config['Links']['linkGameProtonDBStatus'] + str(game) + '.json'
             r = requests.get(url)
             response = r.json()
-            with open(os.path.join( DATA_PATH , 'gamnesstatus',str(game)+'.json')) as f:
-                json.dumps(response, f)
-        except:
-            pass
+            temppath  = os.path.join( DATA_PATH , 'games-status',str(game)+'.json')
+            with open(temppath, 'w+') as f:
+                json.dump(response, f)
+        except json.JSONDecodeError as e:
+            with open("testlog.txt", 'w+') as f:
+                str(e)
+                f.write(str(e))
+        except ValueError as e:
+            print(cmsg.WarnningMsg(e))
+        except NoneType as e:
+            print(cmsg.WarrningMsg(e))
+            print("There might be a problem with amount of requests")
+        except TypeError as e:
+            print(e)
+        except Exception as e:
+            print(e)
+
+            
 
 def CreateFile(path):
     with open(path , 'w+'):
         print("Path %s has been created" %path)
 
+
+###################
 def checkIfProtonDBGame():
     for i in gamesIDList:
         try:
@@ -82,6 +98,8 @@ def checkIfProtonDBGame():
 
     return gamesIDList
 
-el = test.InfoMsg(ammountInfo())
+el = cmsg.InfoMsg(ammountInfo())
+CreateProgramsJson()
+CheckProtonDBStatus(1303100)
 print(el)
 
