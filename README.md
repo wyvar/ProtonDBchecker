@@ -20,6 +20,7 @@ Into a programs they are counting
 - Non public versions of projects
 - ProtonDB 
 - Tests
+
 and without categorys it's a hustle to sort it because there is 130 000 programs at the moment. To check it all i need to call the API function to check INDIVIDUAL NUMBER, to get JSON request. So first you need to get list filter it and update twice a week (at least). 
 
 ## TODO
